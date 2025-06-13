@@ -1,0 +1,18 @@
+{
+  "author": [
+    "Haku"
+  ],
+  "name": "Update Masking",
+  "bot_version": [
+    3,
+    0,
+    0
+  ],
+  "description": "Hunter prime sequel",
+  "hidden": false,
+  "install_msg": "Update masking successfully installed.",
+  "short": "Update Masking Stuff",
+  "tags": [
+    "fun"
+  ]
+}
