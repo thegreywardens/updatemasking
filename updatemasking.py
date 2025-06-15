@@ -2,9 +2,10 @@ from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.utils.chat_formatting import pagify
 import discord
+from typing import Callable, Any
 
 
-def check_all(*predicates):
+def check_all(*predicates: Callable[[commands.Context], Any]):
     """
     Decorator that requires all provided predicates to be true.
     Usage: @check_all(predicate1, predicate2, predicate3)
