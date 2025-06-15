@@ -4,6 +4,19 @@ from redbot.core.utils.chat_formatting import pagify
 import discord
 
 
+def check_all(*predicates):
+    """
+    Decorator that requires all provided predicates to be true.
+    Usage: @check_all(predicate1, predicate2, predicate3)
+    """
+    async def predicate(ctx):
+        for pred in predicates:
+            if not await pred(ctx):
+                return False
+        return True
+    return commands.check(predicate)
+
+
 async def has_update_command_role(ctx: commands.Context) -> bool:
     """
     Checks if the user has the update command role.
@@ -37,15 +50,6 @@ async def has_updating_role(ctx: commands.Context) -> bool:
     return updating_role in ctx.author.roles
 
 
-async def has_liberator_and_updating_role(ctx: commands.Context) -> bool:
-    """
-    Checks if the user has the Liberator role and does not have the Updating role.
-    """
-    if ctx.guild is None:
-        return False
-    return (await has_liberator_role(ctx)) and (await has_updating_role(ctx))
-
-
 async def is_update_planning_channel(ctx: commands.Context) -> bool:
     """
     Checks if the command is being used in the Update Planning channel.
@@ -54,13 +58,6 @@ async def is_update_planning_channel(ctx: commands.Context) -> bool:
         return False
     update_planning_channel = discord.utils.get(ctx.guild.channels, name="update-planning")
     return ctx.channel == update_planning_channel
-
-
-async def has_update_command_role_and_is_update_planning_channel(ctx: commands.Context) -> bool:
-    """
-    Checks if the user has the update command role and is in the Update Planning channel.
-    """
-    return await has_update_command_role(ctx) and await is_update_planning_channel(ctx)
 
 
 class UpdateMasking(commands.Cog):
@@ -89,7 +86,7 @@ class UpdateMasking(commands.Cog):
             await ctx.send("Marked {} as present for this update.".format(author.mention))
 
     @commands.command()
-    @commands.check(has_liberator_and_updating_role)
+    @check_all(has_liberator_role, has_updating_role)
     async def bye(self, ctx: commands.Context):
         """Remove the Updating role from the user"""
         guild = ctx.guild
@@ -128,7 +125,7 @@ class UpdateMasking(commands.Cog):
                 await ctx.send(f"{member.mention}: Unmasked.")
 
     @commands.command()
-    @commands.check(has_update_command_role_and_is_update_planning_channel)
+    @check_all(has_update_command_role, is_update_planning_channel)
     async def annoy_list(self, ctx: commands.Context):
         """List all users with the Updating role"""
         guild = ctx.guild
